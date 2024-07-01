@@ -21,6 +21,14 @@ class Date:
     def open(self):
         return self.d.weekday() < 5 and not self.holiday
 
+    @property
+    def num(self):
+        return self.year * 10000 + self.month * 100 + self.day
+
+    @property
+    def str(self):
+        return self.strftime('%Y%m%d')
+
     def __add__(self, days):
         d = self.d + pydt.timedelta(days)
         return Date(d.year, d.month, d.day)
