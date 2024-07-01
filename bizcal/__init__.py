@@ -31,7 +31,7 @@ class Date:
         return Date(d.year, d.month, d.day)
 
     def __sub__(self, days):
-        d = self.d + pydt.timedelta(-days)
+        d = self.d - pydt.timedelta(days)
         return Date(d.year, d.month, d.day)
 
     def __str__(self):
@@ -48,10 +48,8 @@ class Calendar:
         cals = {}
         for line in spec:
             s = line.split(':')
-            year = int(s[0])
-            line = s[1]
-            cals[year] = set(x for spec in line.split(',')
-                             for x in parse_hhmm(year, spec))
+            cals[int(s[0])] = set(x for spec in s[1].split(',')
+                                  for x in parse_hhmm(int(s[0]), spec))
         if not cals:
             raise ValueError('invalid calendar spec')
         years = sorted(cals.keys())
