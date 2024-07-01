@@ -18,16 +18,13 @@ class Date:
         self.holiday = holiday
 
     @property
-    def open(self):
-        return self.d.weekday() < 5 and not self.holiday
+    def open(self): return self.d.weekday() < 5 and not self.holiday
 
     @property
-    def num(self):
-        return self.year * 10000 + self.month * 100 + self.day
+    def num(self): return self.year * 10000 + self.month * 100 + self.day
 
     @property
-    def str(self):
-        return self.strftime('%Y%m%d')
+    def str(self): return self.strftime('%Y%m%d')
 
     def __add__(self, days):
         d = self.d + pydt.timedelta(days)
@@ -54,7 +51,7 @@ class Calendar:
             year = int(s[0])
             line = s[1]
             cals[year] = set(x for spec in line.split(',')
-                             for x in parse_period(spec))
+                             for x in parse_hhmm(year, spec))
         if not cals:
             raise ValueError('invalid calendar spec')
         years = sorted(cals.keys())
@@ -65,7 +62,7 @@ class Calendar:
         self.table = [cals[y] for y in years]
 
 
-def parse_period(spec):
+def parse_hhmm(year, spec):
     if '-' not in spec:
         yield int(spec)
         return
@@ -74,8 +71,8 @@ def parse_period(spec):
         raise ValueError(f'invalid period spec {spec}')
     beg = int(s[0])
     end = int(s[0][:-len(s[1])] + s[1])
-    day = pydt.date(2024, beg // 100, beg % 100)
-    end = pydt.date(2024, end // 100, end % 100)
+    day = pydt.date(year, beg // 100, beg % 100)
+    end = pydt.date(year, end // 100, end % 100)
     oneday = pydt.timedelta(1)
     while day <= end:
         yield day.month * 100 + day.day

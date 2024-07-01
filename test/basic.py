@@ -11,4 +11,9 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(len(s.table[0]), 26)
         self.assertEqual(len(s.table[1]), 28)
 
+        s = Calendar(['2023: 0228-0301', '2024: 0228-0301'])
+        self.assertEqual(len(s.table), 2)
+        self.assertEqual(len(s.table[0]), 2)
+        self.assertEqual(len(s.table[1]), 3)
+
 ### test/basic.py ends here
