@@ -87,7 +87,10 @@ class Date(pydt.date):
     @property
     def num(self): return self.year * 10000 + self.month * 100 + self.day
 
-    def str(self, sep=''): return self.strftime(f'%Y{sep}%m{sep}%d')
+    @property
+    def str(self): return self.spec()
+
+    def spec(self, sep=''): return self.strftime(f'%Y{sep}%m{sep}%d')
 
 
     ############################################################################

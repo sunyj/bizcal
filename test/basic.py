@@ -52,7 +52,7 @@ class TestBasic(unittest.TestCase):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         days = list(cal[20240101, '2024-01.05'].bizdays)
         self.assertEqual(len(days), 4)
-        self.assertEqual(days[-1].strftime('%Y%m%d'), '20240105')
+        self.assertEqual(days[-1].num, 20240105)
         span = cal[20240210, 20240215]
         self.assertEqual(list(span), [])
         self.assertEqual(len(list(span.days)), 6)
@@ -67,8 +67,8 @@ class TestBasic(unittest.TestCase):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         day = cal(20240101)
         self.assertEqual(day.num, 20240101)
-        self.assertEqual(day.str(), '20240101')
-        self.assertEqual(day.str('-'), '2024-01-01')
+        self.assertEqual(day.str, '20240101')
+        self.assertEqual(day.spec('-'), '2024-01-01')
         self.assertEqual(day.idx, 0)
         self.assertFalse(day.open)
         self.assertFalse(day)
@@ -84,21 +84,21 @@ class TestBasic(unittest.TestCase):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         day = cal(20240101) + 1
         self.assertTrue(day.open)
-        self.assertEqual(day.strftime('%Y%m%d'), '20240102')
+        self.assertEqual(day.str, '20240102')
 
         day = cal(20240228) + 1
         self.assertTrue(day.open)
-        self.assertEqual(day.strftime('%Y%m%d'), '20240229')
+        self.assertEqual(day.num, 20240229)
         day = day - 1
-        self.assertEqual(day.strftime('%Y%m%d'), '20240228')
+        self.assertEqual(day.str, '20240228')
 
 
     def test_biz_shift(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         d = cal(20240101) >> 10
-        self.assertEqual(d.strftime('%Y%m%d'), '20240115')
+        self.assertEqual(d.str, '20240115')
         d = d << 9
-        self.assertEqual(d.strftime('%Y%m%d'), '20240102')
+        self.assertEqual(d.str, '20240102')
         with self.assertRaises(ValueError):
             d << 10
 
