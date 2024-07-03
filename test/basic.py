@@ -66,6 +66,7 @@ class TestBasic(unittest.TestCase):
         day = cal(20240101)
         self.assertEqual(day.idx, 0)
         self.assertFalse(day.open)
+        self.assertFalse(day)
         self.assertFalse(cal(2024, 5, 1).open)
         self.assertTrue(cal(20240501).holiday)
         self.assertTrue(cal('20240501').holiday)

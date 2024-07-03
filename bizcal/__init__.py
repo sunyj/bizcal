@@ -1,5 +1,6 @@
 __all__ = ['Calendar']
 
+
 import re
 import datetime as pydt
 
@@ -74,34 +75,37 @@ class Date(pydt.date):
         return Date(self.year, self.month, self.day, self.cal,
                     self.idx, self.holiday, self.open, _internal=True)
 
-    @property
-    def num(self): return self.year * 10000 + self.month * 100 + self.day
-
     def __eq__(self, d):
         if isinstance(d, Date):
             return self.num == d.num
         return (self.year == d.year and self.month == d.month
                 and self.day == d.day)
 
+    def __bool__(self): return self.open
 
+
+    @property
+    def num(self): return self.year * 10000 + self.month * 100 + self.day
+
+    def str(self, sep=''): return self.strftime(f'%Y{sep}%m{sep}%d')
+
+
+    ############################################################################
+    # calendar day shift
     def __add__(self, days):
-        "Shift calendar days."
         if not days:
             return self.clone()
         d = pydt.date.fromordinal(self.toordinal() + days)
         return Date(d.year, d.month, d.day, self.cal,
                     self.idx if d.year == self.year else None, _internal=True)
 
-    def __sub__(self, days):
-        return self + (-days)
+    def __sub__(self, days): return self + (-days)
 
 
-    def __rshift__(self, days):
-        "Shift business days."
-        return self.shift(days)
-
-    def __lshift__(self, days):
-        return self.shift(-days)
+    ############################################################################
+    # business day shift
+    def __rshift__(self, days): return self.shift(days)
+    def __lshift__(self, days): return self.shift(-days)
 
     def shift(self, days):
         if not days:
