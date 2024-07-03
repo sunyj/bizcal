@@ -145,12 +145,11 @@ class Range:
             day = day + 1
 
     def __len__(self):
-        "Count of business days."
+        "Count business days."
         ans = 0
         day = self.since.clone()
         while day <= self.until:
-            if day.open:
-                ans += 1
+            ans += day.open
             day = day + 1
         return ans
 
