@@ -66,6 +66,9 @@ class TestBasic(unittest.TestCase):
     def test_date(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         day = cal(20240101)
+        self.assertEqual(day.num, 20240101)
+        self.assertEqual(day.str(), '20240101')
+        self.assertEqual(day.str('-'), '2024-01-01')
         self.assertEqual(day.idx, 0)
         self.assertFalse(day.open)
         self.assertFalse(day)
