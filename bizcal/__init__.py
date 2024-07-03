@@ -87,6 +87,9 @@ class Calendar:
 
     def _parse_date(self, spec):
         if isinstance(spec, str):
+            if spec == 'today':
+                d = pydt.datetime.now().date()
+                return (d, self._idx(d))
             return self._parse_date(int(re.sub(r'\D', '', spec)))
         if isinstance(spec, (list, tuple)):
             return self._parse_date(pydt.date(*spec))

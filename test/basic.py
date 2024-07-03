@@ -74,6 +74,10 @@ class TestBasic(unittest.TestCase):
         self.assertFalse(day.open)
         self.assertFalse(cal(2024, 5, 1).open)
         self.assertTrue(cal(20240501).holiday)
+        self.assertTrue(cal('20240501').holiday)
+        self.assertTrue(cal(2024, 5, 1).holiday)
+        self.assertTrue(cal('today').open)
+
 
     def test_cal_shift(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
