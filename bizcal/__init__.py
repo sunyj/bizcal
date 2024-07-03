@@ -85,51 +85,23 @@ class Calendar:
         self.table = [cals[y] for y in years]
         assert len(self.table) == self.ymax - self.ymin + 1
 
-    def _parse_date(self, spec):
-        if isinstance(spec, str):
-            if spec == 'today':
-                d = pydt.datetime.now().date()
-                return (d, self._idx(d))
-            return self._parse_date(int(re.sub(r'\D', '', spec)))
-        if isinstance(spec, (list, tuple)):
-            return self._parse_date(pydt.date(*spec))
-        if isinstance(spec, pydt.date):
-            d = spec
-        else:
-            if spec < 19000000 or spec > 29999999:
-                raise ValueError(f'invalid date number {spec}')
-            year = spec // 10000
-            mmdd = spec % 10000
-            d = pydt.date(year, mmdd // 100, mmdd % 100)
-        return (d, self._idx(d))
+
+    def __contains__(self, spec):
+        d = parse_date(spec)
+        return d.year >= self.ymin and d.year <= self.ymax
 
     def _idx(self, d):
         if d.year < self.ymin or d.year > self.ymax:
             raise ValueError(f'{d} outside [{self.ymin}, {self.ymax}]')
         return d.year - self.ymin
 
-    def is_holiday(self, spec):
-        d, idx = self._parse_date(spec)
-        return d.month*100 + d.day in self.table[idx]
 
-
-    def is_open(self, spec):
-        d, idx = self._parse_date(spec)
-        return d.weekday() < 5 and d.month * 100 + d.day not in self.table[idx]
-
-    def __contains__(self, spec):
-        return self.is_open(spec)
-
-
-    def day(self, *args):
+    def __call__(self, *args):
         if len(args) == 3:
             return Date(args[0], args[1], args[2], self, _internal=True)
         if len(args) == 1:
-            d, idx = self._parse_date(args[0])
-            return Date(d.year, d.month, d.day, self, idx, _internal=True)
-
-    def __call__(self, *spec):
-        return self.day(*spec)
+            d = parse_date(args[0])
+            return Date(d.year, d.month, d.day, self, _internal=True)
 
 
     def bizdays(self, since, until=None):
@@ -139,8 +111,8 @@ class Calendar:
             if not isinstance(since, str):
                 raise TypeError('only string allowed in single-param bizdays')
             since, until = parse_range(since)
-        d, _ = self._parse_date(since)
-        end, _ = self._parse_date(until)
+        d = parse_date(since)
+        end = parse_date(until)
         one = pydt.timedelta(1)
         while d <= end:
             idx = self._idx(d)
@@ -149,6 +121,22 @@ class Calendar:
                 yield Date(d.year, d.month, d.day, self,
                            idx, holiday, True, _internal=True)
             d += one
+
+
+def parse_date(spec):
+    if isinstance(spec, str):
+        if spec == 'today':
+            return pydt.datetime.now().date()
+        return parse_date(int(re.sub(r'\D', '', spec)))
+    if isinstance(spec, pydt.date):
+        return spec
+    if isinstance(spec, (list, tuple)):
+        return parse_date(pydt.date(*spec))
+    if spec < 19000000 or spec > 29999999:
+        raise ValueError(f'invalid date number {spec}')
+    year = spec // 10000
+    mmdd = spec % 10000
+    return pydt.date(year, mmdd // 100, mmdd % 100)
 
 
 def parse_mmdd(year, spec):

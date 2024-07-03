@@ -32,28 +32,20 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(len(s.table[1]), 3)
 
 
-    def test_open(self):
-        cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
-        with self.assertRaises(ValueError):
-            cal.is_open(20230701)
-        with self.assertRaises(ValueError):
-            cal.is_open(20990701)
-        self.assertTrue(20240701 in cal)
-        self.assertTrue(20240707 not in cal)
-        self.assertFalse(cal.is_open(20240501))
-
-
     def test_holiday(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
+        self.assertTrue(20240701 in cal)
+        self.assertFalse(cal(20240501).open)
         with self.assertRaises(ValueError):
-            cal.is_open(20230501)
+            cal(20230501).biz
         with self.assertRaises(ValueError):
-            cal.is_open(20990501)
-        self.assertTrue(cal.is_holiday(20240501))
-        self.assertTrue(cal.is_holiday(20240101))
-        self.assertFalse(cal.is_holiday(20241231))
-        self.assertTrue(cal.is_holiday([2024, 5, 1]))
-        self.assertTrue(cal.is_holiday((2024, 1, 1)))
+            cal(20990501).biz
+        self.assertTrue(cal(20240501).holiday)
+        self.assertTrue(cal(20240101).holiday)
+        self.assertFalse(cal(20241231).holiday)
+        self.assertTrue(cal([2024, 5, 1]).holiday)
+        self.assertTrue(cal((2024, 1, 1)).holiday)
+        self.assertTrue(cal(2024, 1, 1).holiday)
 
 
     def test_bizdays(self):
@@ -76,7 +68,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal(20240501).holiday)
         self.assertTrue(cal('20240501').holiday)
         self.assertTrue(cal(2024, 5, 1).holiday)
-        self.assertTrue(cal('today').open)
+        self.assertTrue(cal([2024, 5, 1]).holiday)
+        self.assertTrue(cal((2024, 5, 1)).holiday)
 
 
     def test_cal_shift(self):
