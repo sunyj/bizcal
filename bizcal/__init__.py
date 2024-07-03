@@ -5,7 +5,10 @@ import datetime as pydt
 
 
 class Date(pydt.date):
-    def __new__(cls, y, m, d, cal, idx=None, holiday=None, biz=None):
+    def __new__(cls, y, m, d, cal, idx=None, holiday=None, biz=None,
+                *, _internal=None):
+        if not _internal:
+            raise TypeError('Date is an internal type, do NOT use it!')
         day = pydt.date.__new__(cls, y, m, d)
         day.cal = cal
         day.idx = cal._idx(day) if idx is None else idx
@@ -19,7 +22,7 @@ class Date(pydt.date):
 
     def clone(self):
         return Date(self.year, self.month, self.day, self.cal,
-                    self.idx, self.holiday, self.open)
+                    self.idx, self.holiday, self.open, _internal=True)
 
     @property
     def num(self): return self.year * 10000 + self.month * 100 + self.day
@@ -37,7 +40,7 @@ class Date(pydt.date):
             return self.clone()
         d = pydt.date.fromordinal(self.toordinal() + days)
         return Date(d.year, d.month, d.day, self.cal,
-                    self.idx if d.year == self.year else None)
+                    self.idx if d.year == self.year else None, _internal=True)
 
     def __sub__(self, days):
         return self + (-days)
@@ -117,10 +120,10 @@ class Calendar:
 
     def day(self, *args):
         if len(args) == 3:
-            return Date(args[0], args[1], args[2], self)
+            return Date(args[0], args[1], args[2], self, _internal=True)
         if len(args) == 1:
             d, idx = self._parse_date(args[0])
-            return Date(d.year, d.month, d.day, self, idx)
+            return Date(d.year, d.month, d.day, self, idx, _internal=True)
 
     def __call__(self, *spec):
         return self.day(*spec)
