@@ -29,11 +29,6 @@ class Calendar:
         d = parse_date(spec)
         return d.year >= self.ymin and d.year <= self.ymax
 
-    def _idx(self, d):
-        if d.year < self.ymin or d.year > self.ymax:
-            raise ValueError(f'{d} outside [{self.ymin}, {self.ymax}]')
-        return d.year - self.ymin
-
 
     def __call__(self, *args):
         if len(args) == 3:
@@ -61,7 +56,12 @@ class Date(pydt.date):
             raise TypeError('Date is an internal type, do NOT use it!')
         day = pydt.date.__new__(cls, y, m, d)
         day.cal = cal
-        day.idx = cal._idx(day) if idx is None else idx
+        if idx is None:
+            if day.year < cal.ymin or day.year > cal.ymax:
+                raise ValueError(f'{day} outside [{cal.ymin}, {cal.ymax}]')
+            day.idx = day.year - cal.ymin
+        else:
+            day.idx = idx
         if holiday is None:
             day.holiday = day.month * 100 + day.day in cal.table[day.idx]
         else:
