@@ -59,6 +59,8 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(len(list(cal['20240101-5'])), 4)
         self.assertEqual(len(list(cal['20240901-30'])), 19)
         self.assertEqual(list(cal['20240101']), [])
+        self.assertEqual(len(cal['2024.0101-5']), 4)
+        self.assertEqual(len(cal[20240210, 20240215]), 0)
 
 
     def test_date(self):

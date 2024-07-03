@@ -144,6 +144,16 @@ class Range:
             yield day
             day = day + 1
 
+    def __len__(self):
+        "Count of business days."
+        ans = 0
+        day = self.since.clone()
+        while day <= self.until:
+            if day.open:
+                ans += 1
+            day = day + 1
+        return ans
+
 
 def parse_date(spec):
     if isinstance(spec, str):
