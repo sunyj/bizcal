@@ -136,13 +136,16 @@ class Calendar:
             if not isinstance(since, str):
                 raise TypeError('only string allowed in single-param bizdays')
             since, until = parse_range(since)
-        day, _ = self._parse_date(since)
+        d, _ = self._parse_date(since)
         end, _ = self._parse_date(until)
         one = pydt.timedelta(1)
-        while day <= end:
-            if self.is_open(day):
-                yield day
-            day += one
+        while d <= end:
+            idx = self._idx(d)
+            holiday = d.month * 100 + d.day in self.table[idx]
+            if d.weekday() < 5 and not holiday:
+                yield Date(d.year, d.month, d.day, self,
+                           idx, holiday, True, _internal=True)
+            d += one
 
 
 def parse_mmdd(year, spec):
