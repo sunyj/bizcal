@@ -4,6 +4,64 @@ import re
 import datetime as pydt
 
 
+class Calendar:
+    def __init__(self, spec):
+        if isinstance(spec, str):
+            with open(spec) as f:
+                spec = [s.strip() for s in f if s.strip()]
+        cals = {}
+        for line in spec:
+            s = line.split(':')
+            cals[int(s[0])] = set(x for spec in s[1].split(',')
+                                  for x in parse_mmdd(int(s[0]), spec))
+        if not cals:
+            raise ValueError('invalid calendar spec')
+        years = sorted(cals.keys())
+        self.ymin = years[0]
+        self.ymax = years[-1]
+        if self.ymax - self.ymin + 1 < len(years):
+            raise ValueError('incomplete calendar spec')
+        self.table = [cals[y] for y in years]
+        assert len(self.table) == self.ymax - self.ymin + 1
+
+
+    def __contains__(self, spec):
+        d = parse_date(spec)
+        return d.year >= self.ymin and d.year <= self.ymax
+
+    def _idx(self, d):
+        if d.year < self.ymin or d.year > self.ymax:
+            raise ValueError(f'{d} outside [{self.ymin}, {self.ymax}]')
+        return d.year - self.ymin
+
+
+    def __call__(self, *args):
+        if len(args) == 3:
+            return Date(args[0], args[1], args[2], self, _internal=True)
+        if len(args) == 1:
+            d = parse_date(args[0])
+            return Date(d.year, d.month, d.day, self, _internal=True)
+
+
+    def bizdays(self, since, until=None):
+        "Generate business days."
+
+        if until is None:
+            if not isinstance(since, str):
+                raise TypeError('only string allowed in single-param bizdays')
+            since, until = parse_range(since)
+        d = parse_date(since)
+        end = parse_date(until)
+        one = pydt.timedelta(1)
+        while d <= end:
+            idx = self._idx(d)
+            holiday = d.month * 100 + d.day in self.table[idx]
+            if d.weekday() < 5 and not holiday:
+                yield Date(d.year, d.month, d.day, self,
+                           idx, holiday, True, _internal=True)
+            d += one
+
+
 class Date(pydt.date):
     def __new__(cls, y, m, d, cal, idx=None, holiday=None, biz=None,
                 *, _internal=None):
@@ -63,64 +121,6 @@ class Date(pydt.date):
             day = day + delta
             days -= (day.open and 1 or 0)
         return day
-
-
-class Calendar:
-    def __init__(self, spec):
-        if isinstance(spec, str):
-            with open(spec) as f:
-                spec = [s.strip() for s in f if s.strip()]
-        cals = {}
-        for line in spec:
-            s = line.split(':')
-            cals[int(s[0])] = set(x for spec in s[1].split(',')
-                                  for x in parse_mmdd(int(s[0]), spec))
-        if not cals:
-            raise ValueError('invalid calendar spec')
-        years = sorted(cals.keys())
-        self.ymin = years[0]
-        self.ymax = years[-1]
-        if self.ymax - self.ymin + 1 < len(years):
-            raise ValueError('incomplete calendar spec')
-        self.table = [cals[y] for y in years]
-        assert len(self.table) == self.ymax - self.ymin + 1
-
-
-    def __contains__(self, spec):
-        d = parse_date(spec)
-        return d.year >= self.ymin and d.year <= self.ymax
-
-    def _idx(self, d):
-        if d.year < self.ymin or d.year > self.ymax:
-            raise ValueError(f'{d} outside [{self.ymin}, {self.ymax}]')
-        return d.year - self.ymin
-
-
-    def __call__(self, *args):
-        if len(args) == 3:
-            return Date(args[0], args[1], args[2], self, _internal=True)
-        if len(args) == 1:
-            d = parse_date(args[0])
-            return Date(d.year, d.month, d.day, self, _internal=True)
-
-
-    def bizdays(self, since, until=None):
-        "Generate business days."
-
-        if until is None:
-            if not isinstance(since, str):
-                raise TypeError('only string allowed in single-param bizdays')
-            since, until = parse_range(since)
-        d = parse_date(since)
-        end = parse_date(until)
-        one = pydt.timedelta(1)
-        while d <= end:
-            idx = self._idx(d)
-            holiday = d.month * 100 + d.day in self.table[idx]
-            if d.weekday() < 5 and not holiday:
-                yield Date(d.year, d.month, d.day, self,
-                           idx, holiday, True, _internal=True)
-            d += one
 
 
 def parse_date(spec):
