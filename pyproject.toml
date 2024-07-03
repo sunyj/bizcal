@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bizcal"
+version = "0.1.0"
+authors = [
+  { name="Sun Yijiang", email="sunyijiang@gmail.com" },
+]
+description = "Pythonic Business (Trading) Calendar."
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/sunyj/bizcal"
+"Bug Tracker" = "https://github.com/sunyj/bizcal/issues"
