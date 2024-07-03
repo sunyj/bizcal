@@ -13,7 +13,7 @@ class Calendar:
         for line in spec:
             s = line.split(':')
             cals[int(s[0])] = set(x for spec in s[1].split(',')
-                                  for x in parse_mmdd(int(s[0]), spec))
+                                  for x in date_range(int(s[0]), spec))
         if not cals:
             raise ValueError('invalid calendar spec')
         years = sorted(cals.keys())
@@ -43,23 +43,15 @@ class Calendar:
             return Date(d.year, d.month, d.day, self, _internal=True)
 
 
-    def bizdays(self, since, until=None):
-        "Generate business days."
-
-        if until is None:
-            if not isinstance(since, str):
-                raise TypeError('only string allowed in single-param bizdays')
-            since, until = parse_range(since)
-        d = parse_date(since)
-        end = parse_date(until)
-        one = pydt.timedelta(1)
-        while d <= end:
-            idx = self._idx(d)
-            holiday = d.month * 100 + d.day in self.table[idx]
-            if d.weekday() < 5 and not holiday:
-                yield Date(d.year, d.month, d.day, self,
-                           idx, holiday, True, _internal=True)
-            d += one
+    def __getitem__(self, spec):
+        if isinstance(spec, tuple):
+            if len(spec) != 2:
+                raise ValueError('only cal[beg, end] allowed')
+        elif isinstance(spec, str):
+            spec = tuple(parse_range(spec))
+        else:
+            raise ValueError(f'illegal range spec {spec}')
+        return Range(self(spec[0]), self(spec[1]), _internal=True)
 
 
 class Date(pydt.date):
@@ -123,6 +115,32 @@ class Date(pydt.date):
         return day
 
 
+class Range:
+    def __init__(self, since, until, *, _internal=None):
+        if not _internal:
+            raise TypeError('Range is an internal type, do NOT use it!')
+        self.since, self.until = (since, until)
+
+    def __iter__(self): return self.bizdays
+
+    @property
+    def bizdays(self):
+        "Generate business days."
+        day = self.since.clone()
+        while day <= self.until:
+            if day.open:
+                yield day
+            day = day + 1
+
+    @property
+    def days(self):
+        "Generate calendar days."
+        day = self.since.clone()
+        while day <= self.until:
+            yield day
+            day = day + 1
+
+
 def parse_date(spec):
     if isinstance(spec, str):
         if spec == 'today':
@@ -139,19 +157,6 @@ def parse_date(spec):
     return pydt.date(year, mmdd // 100, mmdd % 100)
 
 
-def parse_mmdd(year, spec):
-    if '-' not in spec:
-        yield int(spec)
-        return
-    beg, end = parse_range(spec, numeric=True)
-    day = pydt.date(year, beg // 100, beg % 100)
-    end = pydt.date(year, end // 100, end % 100)
-    oneday = pydt.timedelta(1)
-    while day <= end:
-        yield day.month * 100 + day.day
-        day = day + oneday
-
-
 def parse_range(spec, numeric=False):
     if numeric:
         s = parse_range(spec, False)
@@ -164,6 +169,19 @@ def parse_range(spec, numeric=False):
     if len(s[0]) < len(s[1]):
         return (s[0], s[1])
     return (s[0], s[0][:-len(s[1])] + s[1])
+
+
+def date_range(year, spec):
+    if '-' not in spec:
+        yield int(spec)
+        return
+    beg, end = parse_range(spec, numeric=True)
+    day = pydt.date(year, beg // 100, beg % 100)
+    end = pydt.date(year, end // 100, end % 100)
+    oneday = pydt.timedelta(1)
+    while day <= end:
+        yield day.month * 100 + day.day
+        day = day + oneday
 
 
 ### bizcal/__init__.py ends here

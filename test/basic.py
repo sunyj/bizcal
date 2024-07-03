@@ -50,13 +50,15 @@ class TestBasic(unittest.TestCase):
 
     def test_bizdays(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
-        days = list(cal.bizdays(20240101, '2024-01.05'))
+        days = list(cal[20240101, '2024-01.05'].bizdays)
         self.assertEqual(len(days), 4)
         self.assertEqual(days[-1].strftime('%Y%m%d'), '20240105')
-        self.assertEqual(list(cal.bizdays(20240210, 20240215)), [])
-        self.assertEqual(len(list(cal.bizdays('20240101-5'))), 4)
-        self.assertEqual(len(list(cal.bizdays('20240901-30'))), 19)
-        self.assertEqual(list(cal.bizdays('20240101')), [])
+        span = cal[20240210, 20240215]
+        self.assertEqual(list(span), [])
+        self.assertEqual(len(list(span.days)), 6)
+        self.assertEqual(len(list(cal['20240101-5'])), 4)
+        self.assertEqual(len(list(cal['20240901-30'])), 19)
+        self.assertEqual(list(cal['20240101']), [])
 
 
     def test_date(self):
