@@ -10,7 +10,7 @@ class TestBasic(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_range('1-2-3')
         self.assertEqual(parse_range('abc'), ('abc', 'abc'))
-        self.assertEqual(parse_range('abc-1234'), ('abc', '1234'))
+        self.assertEqual(parse_range('000-1234'), ('000', '1234'))
         self.assertEqual(parse_range('1234-56'), ('1234', '1256'))
         self.assertEqual(parse_range('1234-4567'), ('1234', '4567'))
         self.assertEqual(parse_range('1234-12345'), ('1234', '12345'))
@@ -48,8 +48,24 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal(2024, 1, 1).holiday)
 
 
-    def test_bizdays(self):
+    def test_first_last(self):
+        from bizcal import first_day, last_day
+        self.assertEqual(first_day('20240101').strftime('%Y%m%d'), '20240101')
+        self.assertEqual(first_day('202401').strftime('%Y%m%d'), '20240101')
+        self.assertEqual(first_day('2020').strftime('%Y%m%d'), '20200101')
+        self.assertEqual(last_day('20240101').strftime('%Y%m%d'), '20240101')
+        self.assertEqual(last_day('202401').strftime('%Y%m%d'), '20240131')
+        self.assertEqual(last_day('202402').strftime('%Y%m%d'), '20240229')
+        self.assertEqual(last_day('202202').strftime('%Y%m%d'), '20220228')
+        self.assertEqual(last_day('202002').strftime('%Y%m%d'), '20200229')
+        self.assertEqual(last_day('2024').strftime('%Y%m%d'), '20241231')
+
+    def test_range(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
+
+        self.assertEqual(len(cal['202401']), 22)
+        self.assertEqual(len(cal['202401-2']), 38)
+
         days = list(cal[20240101, '2024-01.05'].bizdays)
         self.assertEqual(len(days), 4)
         self.assertEqual(days[-1].num, 20240105)
