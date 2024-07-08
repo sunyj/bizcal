@@ -2,7 +2,7 @@
 
 **Bizcal** is a simple business calendar package with three unique features:
 
-- Compatibility: drop-in replacement of `datetime.date`.
+- Compatibility: Acts as a drop-in replacement for `datetime.date`.
 - Pythonic: intuitive syntax.
 - Holiday-aware: not just *when* not trading, but also *why*.
 
@@ -10,9 +10,9 @@ Bizcal is [listed on PyPI](https://pypi.org/project/bizcal/).
 
 ## Compatibility
 
-Bizcal abstracts dates with class `Date` , which is a direct sub-class of the standard `datetime.date`.   This feature makes possible bizcal a drop-in replacement of `datime.date` to your legacy code bases.
+Bizcal abstracts dates with `Date` class, a direct subclass of the standard `datetime.date`, allowing it to seamlessly integrate into legacy codebases as a drop-in replacement for `datetime.date`.
 
-In addition, `Date` defines a few handy methods and properties to help simplify your code.
+Additionally, `Date` includes several convenient methods and properties designed to simplify your code.
 
 ## Pythonic
 
@@ -52,7 +52,7 @@ for day in period.days:
 
 ## Holiday-aware
 
-Some exchanges (such as [SHFE](https://tsite.shfe.com.cn/eng/), [DCE](http://www.dce.com.cn/DCE/)) arrange trading hours according to holiday schedules.  Bizcal handles not only business (opening) and non-business (closing) days, but also tells if a non-business day is a holiday.
+Certain exchanges, like [SHFE](https://tsite.shfe.com.cn/eng/) and [DCE](http://www.dce.com.cn/DCE/), adjust their trading hours based on holiday schedules. Bizcal not only identifies business (open) and non-business (closed) days but also specifies if a non-business day is a holiday.
 
 ## API Reference
 
@@ -67,15 +67,15 @@ cal = Calendar([
 ])
 ```
 
-Constructor `Calendar(spec)` accepts `spec` as a string or a list of strings.
+The `Calendar(spec)` constructor accepts `spec` as either a string or a list of strings.
 
-- If `spec` is a string, it is accepted as a path to calendar definition file.  Each line defines calendar for one year by providing all holidays (may include weekends) of that year.
-- If `spec` is a list of string, each string should be a line of calendar definition for one year.
-- Year line format: `YYYY: holidays, holidays, ...`, where `holidays` should be a date range with format `MMDD`, `MMDD-DD` or `MMDD-MMDD`。
+- If `spec` is a string, it is treated as a path to a calendar definition file. Each line in the file defines the holidays (and potentially weekends) for a specific year.
+- If `spec` is a list of strings, each string represents a line of calendar definitions for one year.
+- The year line format is `YYYY: holidays, holidays, ...`, where `holidays` are specified as date ranges in the format `MMDD`, `MMDD-DD`, or `MMDD-MMDD`.
 
 ### Date creation
 
-`Date` objects can only be created from a `Calendar` object with call syntax.  Multiple input formats are supported.
+`Date` objects can only be created from a `Calendar` object using call syntax. Multiple input formats are supported.
 
 ```python
 cal = Calendar([...])
@@ -91,7 +91,7 @@ day = cal([2025, 1, 1]) # error, as date is out of calendar scope
 
 ### Date manipulation
 
-A `Date` object can be shifted back and forth as calendar or business day.  Operator `+` and `-` shifts as calendar day;  Operator `>>` and `<<` shifts as business day.
+A `Date` object can be shifted both as calendar days and business days. The `+` and `-` operators shift the date as calendar days, while the `>>` and `<<` operators shift the date as business days.
 
 ```python
 cal = Calendar([...])
@@ -108,21 +108,25 @@ day << 10  # 2024-04-17
 
 `Date` is sub-class of `datetime.date`, so apparently all `date` methods are supported.
 
-- Extra properties
-  - `Date.open`: is business day, boolean.
-    - `Date.__bool__()`: bool operator, business day or not.
-  - `Date.holiday`: is holiday, boolean.
-  - `Date.num`: `YYYYMMDD` integer.
-  - `Date.str`: `"YYYYMMDD"` string.
-  - `Date.eom`: end-of-month boolean.
-- Extra methods:
-  - `Date.spec(sep='')`: `YYYY{sep}MM{sep}DD` string.
-  - `Date.shift(days)`: explicit business day shift.
+- `Date` is a subclass of `datetime.date`, so all `date` methods are supported.
 
+#### Extra Properties
+
+- `Date.open`: Indicates if it is a business day (boolean).
+  - `Date.__bool__()`: Boolean operator, returns if it is a business day.
+- `Date.holiday`: Indicates if it is a holiday (boolean).
+- `Date.num`: Returns the date as an `YYYYMMDD` integer.
+- `Date.str`: Returns the date as a `"YYYYMMDD"` string.
+- `Date.eom`: Indicates if it is the end of the month (boolean).
+
+#### Extra Methods
+
+- `Date.spec(sep='')`: Returns the date as a `YYYY{sep}MM{sep}DD` string.
+- `Date.shift(days)`: Performs an explicit business day shift.
 
 ### Period definition
 
-A period of dates can be defined with indexing (brackets) syntax.
+A period of dates can be defined using the indexing (brackets) syntax.
 
 ```python
 cal = Calendar([...])
@@ -140,7 +144,7 @@ The length of a period (`len(period)`) is the number of business days in that pe
 
 ### Period iteration
 
-The primary use case of a period is date iteration.  Two generator properties `bizdays` and `days` are implemented for business day and calendar day iteration, respectively.  The default iteration method (`__iter__`) is business day.
+The primary use case of a period is date iteration. Two generator properties, `bizdays` and `days`, are implemented for business day and calendar day iteration, respectively. The default iteration method (`__iter__`) is for business days.
 
 ```python
 # iterate trading days
