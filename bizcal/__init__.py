@@ -118,6 +118,15 @@ class Date(pydt.date):
     def spec(self, sep=''):
         return self.strftime(f'%Y{sep}%m{sep}%d')
 
+    @property
+    def eom(self):
+        if self.day == 31:
+            return True
+        # do NOT shift today, as it may fall outside this calendar
+        d = pydt.date(self.year, self.month, 1) + pydt.timedelta(days=32)
+        d = d.replace(day=1) - pydt.timedelta(days=1)
+        return d.day == self.day
+
     ############################################################################
     # calendar day shift
     def __add__(self, days):
@@ -191,6 +200,18 @@ class Range:
             day = day + 1
         return ans
 
+    @property
+    def spec(self):
+        "Range spec."
+
+        if self.since.day == 1 and self.until.eom:
+            if self.since.month == 1 and self.until.month == 12:
+                return range_join(str(self.since.year), str(self.until.year))
+            return range_join(
+                self.since.strftime('%Y%m'), self.until.strftime('%Y%m')
+            )
+        return range_join(self.since.str, self.until.str)
+
 
 def parse_date(spec):
     if isinstance(spec, str):
@@ -242,6 +263,22 @@ def last_day(spec):
     if len(spec) == 4:
         return last_day(spec + '1231')
     raise ValueError(f'invalid date spec {spec}')
+
+
+def range_join(x, y):
+    if len(x) != len(y):
+        return f'{x}-{y}'
+    if not x:
+        return ''
+    sep = None
+    for i in range(len(x)):
+        if x[i] != y[i]:
+            break
+        sep = i
+    if sep is None:
+        return f'{x}-{y}'
+    sep += 1
+    return x if sep >= len(y) else f'{x}-{y[sep:]}'
 
 
 ### bizcal/__init__.py ends here

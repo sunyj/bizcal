@@ -48,8 +48,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal(2024, 1, 1).holiday)
 
 
-    def test_first_last(self):
-        from bizcal import first_day, last_day
+    def test_helpers(self):
+        from bizcal import first_day, last_day, range_join
         self.assertEqual(first_day('20240101').strftime('%Y%m%d'), '20240101')
         self.assertEqual(first_day('202401').strftime('%Y%m%d'), '20240101')
         self.assertEqual(first_day('2020').strftime('%Y%m%d'), '20200101')
@@ -60,8 +60,20 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(last_day('202002').strftime('%Y%m%d'), '20200229')
         self.assertEqual(last_day('2024').strftime('%Y%m%d'), '20241231')
 
+        self.assertEqual(range_join('', ''), '')
+        self.assertEqual(range_join('123', '4567'), '123-4567')
+        self.assertEqual(range_join('abc100', 'abc101'), 'abc100-1')
+        self.assertEqual(range_join('abc100', 'abc999'), 'abc100-999')
+        self.assertEqual(range_join('abc100', 'abc100'), 'abc100')
+        self.assertEqual(range_join('abc', '100'), 'abc-100')
+        self.assertEqual(range_join('abc', ''), 'abc-')
+        self.assertEqual(range_join('', 'abc'), '-abc')
+
+
     def test_range(self):
-        cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
+        cal = Calendar([
+            '2023: 0101-2,0121-27,0405,0429-0503,0622-24,0929-1006',
+            '2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
 
         self.assertEqual(len(cal['202401']), 22)
         self.assertEqual(len(cal['202401-2']), 38)
@@ -77,6 +89,12 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(list(cal['20240101']), [])
         self.assertEqual(len(cal['2024.0101-5']), 4)
         self.assertEqual(len(cal[20240210, 20240215]), 0)
+        self.assertEqual(cal[20240201, 20240205].spec, '20240201-5')
+        self.assertEqual(cal[20240201, 20240220].spec, '20240201-20')
+        self.assertEqual(cal[20240201, 20241225].spec, '20240201-1225')
+        self.assertEqual(cal[20240101, 20240229].spec, '202401-2')
+        self.assertEqual(cal[20240101, 20241231].spec, '2024')
+        self.assertEqual(cal[20230101, 20241231].spec, '2023-4')
 
 
     def test_date(self):
