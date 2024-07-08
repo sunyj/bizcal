@@ -2,7 +2,7 @@
 
 **Bizcal** is a simple business calendar package with three unique features:
 
-- Compatibility: Acts as a drop-in replacement for `datetime.date`.
+- Compatibility: acts as a drop-in replacement for `datetime.date`.
 - Pythonic: intuitive syntax.
 - Holiday-aware: not just *when* not trading, but also *why*.
 
@@ -106,9 +106,7 @@ day << 10  # 2024-04-17
 
 ### Date methods and properties
 
-`Date` is sub-class of `datetime.date`, so apparently all `date` methods are supported.
-
-- `Date` is a subclass of `datetime.date`, so all `date` methods are supported.
+`Date` is a subclass of `datetime.date`, so all `date` methods are supported.
 
 #### Extra Properties
 
@@ -147,7 +145,7 @@ The length of a period (`len(period)`) is the number of business days in that pe
 The primary use case of a period is date iteration. Two generator properties, `bizdays` and `days`, are implemented for business day and calendar day iteration, respectively. The default iteration method (`__iter__`) is for business days.
 
 ```python
-# iterate trading days
+# iterate business days
 for day in cal['202401']:
     print(f'{day} is a trading day')
 
