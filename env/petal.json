@@ -2,8 +2,8 @@
   "python": "3.8",
   "bases": [],
   "require": [
-    "build",
     "setuptools",
+    "build",
     "twine"
   ]
 }
