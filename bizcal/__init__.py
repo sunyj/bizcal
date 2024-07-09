@@ -16,7 +16,7 @@ class Calendar:
             cals[int(year)] = set(
                 x
                 for holidays in cal_spec.split(',')
-                for x in self.dates_from_range(int(year), holidays)
+                for x in dates_from_range(int(year), holidays)
             )
         if not cals:
             raise ValueError('invalid calendar spec')
@@ -44,24 +44,17 @@ class Calendar:
             if len(spec) != 2:
                 raise ValueError('only cal[beg, end] allowed')
         elif isinstance(spec, str):
-            beg, end = parse_range(spec)
-            spec = (first_day(beg), last_day(end))
+            spec = self.span(spec)
         else:
             raise ValueError(f'illegal range spec {spec}')
         return Range(self(spec[0]), self(spec[1]), _internal=True)
 
     @staticmethod
-    def dates_from_range(year, spec):
-        if '-' not in spec:
-            yield int(spec)
-            return
-        beg, end = parse_range(spec, numeric=True)
-        day = pydt.date(year, beg // 100, beg % 100)
-        end = pydt.date(year, end // 100, end % 100)
-        oneday = pydt.timedelta(1)
-        while day <= end:
-            yield day.month * 100 + day.day
-            day = day + oneday
+    def span(spec: str):
+        if not isinstance(spec, str):
+            raise TypeError('Calendar.span requires string input')
+        beg, end = parse_range(spec)
+        return (first_day(beg), last_day(end))
 
 
 class Date(pydt.date):
@@ -211,6 +204,19 @@ class Range:
                 self.since.strftime('%Y%m'), self.until.strftime('%Y%m')
             )
         return range_join(self.since.str, self.until.str)
+
+
+def dates_from_range(year, spec):
+    if '-' not in spec:
+        yield int(spec)
+        return
+    beg, end = parse_range(spec, numeric=True)
+    day = pydt.date(year, beg // 100, beg % 100)
+    end = pydt.date(year, end // 100, end % 100)
+    oneday = pydt.timedelta(1)
+    while day <= end:
+        yield day.month * 100 + day.day
+        day = day + oneday
 
 
 def parse_date(spec):

@@ -139,4 +139,13 @@ class TestBasic(unittest.TestCase):
             d << 10
 
 
+    def test_span(self):
+        self.assertEqual(Calendar.span('202402'),
+                         (pydt.date(2024, 2, 1), pydt.date(2024, 2, 29)))
+        self.assertEqual(Calendar.span('202401-3'),
+                         (pydt.date(2024, 1, 1), pydt.date(2024, 3, 31)))
+        self.assertEqual(Calendar.span('20240101'),
+                         (pydt.date(2024, 1, 1), pydt.date(2024, 1, 1)))
+
+
 ### test/basic.py ends here

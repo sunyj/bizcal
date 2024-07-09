@@ -154,3 +154,13 @@ for day in cal['20240215-20'].days:
     flag = day and 'trading' or (day.holiday and 'holiday' or 'weekend')
     print(f'{day} is {flag}')
 ```
+### Date span parsing
+
+Static method `Calendar.span(spec: str)` parses a string spec into `(beg, end)` tuple of dates.  `datetime.date` objects are returned.
+
+```python
+from bizcal import Calendar
+
+beg, end = Calendar.span('202402')
+```
+
