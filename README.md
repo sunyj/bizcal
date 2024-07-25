@@ -10,9 +10,12 @@ Bizcal is [listed on PyPI](https://pypi.org/project/bizcal/).
 
 ## Compatibility
 
-Bizcal abstracts dates with `Date` class, a direct subclass of the standard `datetime.date`, allowing it to seamlessly integrate into legacy codebases as a drop-in replacement for `datetime.date`.
+Bizcal abstracts dates with `Date` class, a direct subclass of the standard
+`datetime.date`, allowing it to seamlessly integrate into legacy codebases as
+a drop-in replacement for `datetime.date`.
 
-Additionally, `Date` includes several convenient methods and properties designed to simplify your code.
+Additionally, `Date` includes several convenient methods and properties
+designed to simplify your code.
 
 ## Pythonic
 
@@ -52,7 +55,10 @@ for day in period.days:
 
 ## Holiday-aware
 
-Certain exchanges, like [SHFE](https://tsite.shfe.com.cn/eng/) and [DCE](http://www.dce.com.cn/DCE/), adjust their trading hours based on holiday schedules. Bizcal not only identifies business (open) and non-business (closed) days but also specifies if a non-business day is a holiday.
+Certain exchanges, like [SHFE](https://tsite.shfe.com.cn/eng/) and
+[DCE](http://www.dce.com.cn/DCE/), adjust their trading hours based on holiday
+schedules. Bizcal not only identifies business (open) and non-business
+(closed) days but also specifies if a non-business day is a holiday.
 
 ## API Reference
 
@@ -67,15 +73,22 @@ cal = Calendar([
 ])
 ```
 
-The `Calendar(spec)` constructor accepts `spec` as either a string or a list of strings.
+The `Calendar(spec)` constructor accepts `spec` as either a string or a list
+of strings.
 
-- If `spec` is a string, it is treated as a path to a calendar definition file. Each line in the file defines the holidays (and potentially weekends) for a specific year.
-- If `spec` is a list of strings, each string represents a line of calendar definitions for one year.
-- The year line format is `YYYY: holidays, holidays, ...`, where `holidays` are specified as date ranges in the format `MMDD`, `MMDD-DD`, or `MMDD-MMDD`.
+- If `spec` is a string, it is treated as a path to a calendar definition
+  file. Each line in the file defines the holidays (and potentially weekends)
+  for a specific year.
+- If `spec` is a list of strings, each string represents a line of calendar
+  definitions for one year.
+- The year line format is `YYYY: holidays, holidays, ...`, where `holidays`
+  are specified as date ranges in the format `MMDD`, `MMDD-DD`, or
+  `MMDD-MMDD`.
 
 ### Date creation
 
-`Date` objects can only be created from a `Calendar` object using call syntax. Multiple input formats are supported.
+`Date` objects can only be created from a `Calendar` object using call
+syntax. Multiple input formats are supported.
 
 ```python
 cal = Calendar([...])
@@ -86,12 +99,15 @@ day = cal('2024.05.01') # YYYY.MM.DD
 day = cal(2024, 5, 1)   # year, month, day
 day = cal((2024, 5, 1)) # tuple
 day = cal([2024, 5, 1]) # list
+day = cal(date)         # date or even Date object
 day = cal([2025, 1, 1]) # error, as date is out of calendar scope
 ```
 
 ### Date manipulation
 
-A `Date` object can be shifted both as calendar days and business days. The `+` and `-` operators shift the date as calendar days, while the `>>` and `<<` operators shift the date as business days.
+A `Date` object can be shifted both as calendar days and business days. The
+`+` and `-` operators shift the date as calendar days, while the `>>` and `<<`
+operators shift the date as business days.
 
 ```python
 cal = Calendar([...])
@@ -134,15 +150,21 @@ q1 = cal['202401-3']
 h1 = cal['202401-06']
 years = cal['2023-4']
 
+period = cal[cal('20240101'), cal(2024, 1, 1) + 30]
+
 print(len(jan))  # count trading days
 print(jan.spec)  # period spec string
 ```
 
-The length of a period (`len(period)`) is the number of business days in that period.
+The length of a period (`len(period)`) is the number of business days in that
+period.
 
 ### Period iteration
 
-The primary use case of a period is date iteration. Two generator properties, `bizdays` and `days`, are implemented for business day and calendar day iteration, respectively. The default iteration method (`__iter__`) is for business days.
+The primary use case of a period is date iteration. Two generator properties,
+`bizdays` and `days`, are implemented for business day and calendar day
+iteration, respectively. The default iteration method (`__iter__`) is for
+business days.
 
 ```python
 # iterate business days
@@ -156,11 +178,11 @@ for day in cal['20240215-20'].days:
 ```
 ### Date span parsing
 
-Static method `Calendar.span(spec: str)` parses a string spec into `(beg, end)` tuple of dates.  `datetime.date` objects are returned.
+Static method `Calendar.span(spec: str)` parses a string spec into
+`(beg, end)` tuple of dates.  `datetime.date` objects are returned.
 
 ```python
 from bizcal import Calendar
 
 beg, end = Calendar.span('202402')
 ```
-
