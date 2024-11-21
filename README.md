@@ -2,7 +2,7 @@
 
 **Bizcal** is a simple business calendar package with three unique features:
 
-- Compatibility: acts as a drop-in replacement for `datetime.date`.
+- Compatibility: `bizcal.Date` is a drop-in replacement for `datetime.date`.
 - Pythonic: intuitive syntax.
 - Holiday-aware: not just *when* not trading, but also *why*.
 
@@ -14,8 +14,7 @@ Bizcal abstracts dates with `Date` class, a direct subclass of the standard
 `datetime.date`, allowing it to seamlessly integrate into legacy codebases as
 a drop-in replacement for `datetime.date`.
 
-Additionally, `Date` includes several convenient methods and properties
-designed to simplify your code.
+Additionally, `Date` includes several convenient methods and properties designed to simplify your code.
 
 ## Pythonic
 
@@ -26,7 +25,7 @@ from bizcal import Calendar
 
 cne = Calendar([
     '2023: 0101-2, 0121-29, 0405, 0429-0503, 0622-25, 0929-1008',
-    '2024: 0101, 0209-18, 0404-7, 0501-5, 0610, 0915-7, 1001-7',
+    '2024: 0101, 0209-18, 0404-7, 0501-5, 0608-10, 0914-17, 1001-7',
 ])
 
 day = cne('20240210')
@@ -34,14 +33,19 @@ day = cne('20240210')
 # shift trading day with >> and <<
 while not day:
     day = day >> 1
+prev_trading_day = day << 1
+next_trading_day = day >> 1
 
 # shift calendar day with + and -
-prev = day - 1
-first_day_after_holiday = day and prev.holiday
+yesterday = day - 1
+tomorrow = day + 1
 
 # period abstraction
 period = cne[20240101, 20240131]
 print(len(period), 'trading days')
+
+# whole period
+print(sum(1 for d in cne['*'].days if d.open), 'trading days')
 
 # iterate trading days
 for day in period:
@@ -55,8 +59,7 @@ for day in period.days:
 
 ## Holiday-aware
 
-Certain exchanges, like [SHFE](https://tsite.shfe.com.cn/eng/) and
-[DCE](http://www.dce.com.cn/DCE/), adjust their trading hours based on holiday
+Certain exchanges, like [SHFE](https://tsite.shfe.com.cn/eng/) and [DCE](http://www.dce.com.cn/DCE/), adjust their trading hours based on holiday
 schedules. Bizcal not only identifies business (open) and non-business
 (closed) days but also specifies if a non-business day is a holiday.
 
@@ -69,7 +72,7 @@ from bizcal import Calendar
 cal = Calendar('/path/to/calendar.file')
 cal = Calendar([
     '2023: 0101-2, 0121-29, 0405, 0429-0503, 0622-25, 0929-1008',
-    '2024: 0101, 0209-18, 0404-7, 0501-5, 0610, 0915-7, 1001-7',
+    '2024: 0101, 0209-18, 0404-7, 0501-5, 0608-10, 0914-17, 1001-7',
 ])
 ```
 

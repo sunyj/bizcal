@@ -1,3 +1,4 @@
+########################################################################################
 import unittest, json
 from bizcal import *
 from bizcal import parse_range
@@ -17,10 +18,11 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(parse_range('1234-5'), ('1234', '1235'))
         self.assertEqual(parse_range(''), ('', ''))
 
-
     def test_spec(self):
-        spec = ['2023: 0101-2,0121-27,0405,0429-0503,0622-24,0929-1006',
-                '2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7']
+        spec = [
+            '2023: 0101-2,0121-27,0405,0429-0503,0622-24,0929-1006',
+            '2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7',
+        ]
         cal = Calendar(spec)
         self.assertEqual(len(cal.table), 2)
         self.assertEqual(len(cal.table[0]), 26)
@@ -38,9 +40,12 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal(d2).open)
         self.assertEqual(len(cal[d1, d2]), 6)
 
-
     def test_holiday(self):
-        cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
+        cal = Calendar(['2024: 0101,0209-18,0404-07,0501-05,0608-10,0914-17,1001-07'])
+        self.assertEqual(len(cal['2024']), 242)
+        self.assertEqual(sum(1 for d in cal['*']), 242)
+        self.assertEqual(sum(1 for d in cal['*'].days), 366)
+        self.assertEqual(sum(1 for d in cal['*'].days if d.open), 242)
         self.assertTrue(20240701 in cal)
         self.assertFalse(cal(20240501).open)
         with self.assertRaises(ValueError):
@@ -54,9 +59,9 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal((2024, 1, 1)).holiday)
         self.assertTrue(cal(2024, 1, 1).holiday)
 
-
     def test_helpers(self):
         from bizcal import first_day, last_day, range_join
+
         self.assertEqual(first_day('20240101').strftime('%Y%m%d'), '20240101')
         self.assertEqual(first_day('202401').strftime('%Y%m%d'), '20240101')
         self.assertEqual(first_day('2020').strftime('%Y%m%d'), '20200101')
@@ -76,11 +81,13 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(range_join('abc', ''), 'abc-')
         self.assertEqual(range_join('', 'abc'), '-abc')
 
-
     def test_range(self):
-        cal = Calendar([
-            '2023: 0101-2,0121-27,0405,0429-0503,0622-24,0929-1006',
-            '2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
+        cal = Calendar(
+            [
+                '2023: 0101-2,0121-27,0405,0429-0503,0622-24,0929-1006',
+                '2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7',
+            ]
+        )
 
         self.assertEqual(len(cal['202401']), 22)
         self.assertEqual(len(cal['202401-2']), 38)
@@ -103,7 +110,6 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(cal[20240101, 20241231].spec, '2024')
         self.assertEqual(cal[20230101, 20241231].spec, '2023-4')
 
-
     def test_date(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         day = cal(20240101)
@@ -122,7 +128,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal((2024, 5, 1)).holiday)
         self.assertTrue(cal(pydt.date(2024, 5, 1)).holiday)
 
-
     def test_cal_shift(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         day = cal(20240101) + 1
@@ -135,7 +140,6 @@ class TestBasic(unittest.TestCase):
         day = day - 1
         self.assertEqual(day.str, '20240228')
 
-
     def test_biz_shift(self):
         cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
         d = cal(20240101) >> 10
@@ -145,14 +149,16 @@ class TestBasic(unittest.TestCase):
         with self.assertRaises(ValueError):
             d << 10
 
-
     def test_span(self):
-        self.assertEqual(Calendar.span('202402'),
-                         (pydt.date(2024, 2, 1), pydt.date(2024, 2, 29)))
-        self.assertEqual(Calendar.span('202401-3'),
-                         (pydt.date(2024, 1, 1), pydt.date(2024, 3, 31)))
-        self.assertEqual(Calendar.span('20240101'),
-                         (pydt.date(2024, 1, 1), pydt.date(2024, 1, 1)))
+        self.assertEqual(
+            Calendar.span('202402'), (pydt.date(2024, 2, 1), pydt.date(2024, 2, 29))
+        )
+        self.assertEqual(
+            Calendar.span('202401-3'), (pydt.date(2024, 1, 1), pydt.date(2024, 3, 31))
+        )
+        self.assertEqual(
+            Calendar.span('20240101'), (pydt.date(2024, 1, 1), pydt.date(2024, 1, 1))
+        )
 
 
 ### test/basic.py ends here

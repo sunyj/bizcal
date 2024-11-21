@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bizcal"
-version = "0.1.2"
+version = "0.2.0"
 authors = [
   { name="Sun Yijiang", email="sunyijiang@gmail.com" },
 ]
@@ -20,3 +20,7 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/sunyj/bizcal"
 "Bug Tracker" = "https://github.com/sunyj/bizcal/issues"
+
+[tool.black]
+line-length = 88
+skip-string-normalization = true

@@ -1,3 +1,4 @@
+########################################################################################
 __all__ = ['Calendar']
 
 
@@ -44,6 +45,8 @@ class Calendar:
             if len(spec) != 2:
                 raise ValueError('only cal[beg, end] allowed')
         elif isinstance(spec, str):
+            if spec == '*':
+                spec = f'{self.ymin}-{self.ymax}'
             spec = self.span(spec)
         else:
             raise ValueError(f'illegal range spec {spec}')
@@ -58,9 +61,7 @@ class Calendar:
 
 
 class Date(pydt.date):
-    def __new__(
-        cls, y, m, d, cal, idx=None, holiday=None, biz=None, *, _internal=None
-    ):
+    def __new__(cls, y, m, d, cal, idx=None, holiday=None, biz=None, *, _internal=None):
         if not _internal:
             raise TypeError('Date is an internal type, do NOT use it!')
         day = pydt.date.__new__(cls, y, m, d)
@@ -93,9 +94,7 @@ class Date(pydt.date):
     def __eq__(self, d):
         if isinstance(d, Date):
             return self.num == d.num
-        return (
-            self.year == d.year and self.month == d.month and self.day == d.day
-        )
+        return self.year == d.year and self.month == d.month and self.day == d.day
 
     def __bool__(self):
         return self.open
@@ -120,8 +119,7 @@ class Date(pydt.date):
         d = d.replace(day=1) - pydt.timedelta(days=1)
         return d.day == self.day
 
-    ############################################################################
-    # calendar day shift
+    ### calendar day shift
     def __add__(self, days):
         if not days:
             return self.clone()
@@ -138,8 +136,7 @@ class Date(pydt.date):
     def __sub__(self, days):
         return self + (-days)
 
-    ############################################################################
-    # business day shift
+    ### business day shift
     def __rshift__(self, days):
         return self.shift(days)
 
@@ -168,41 +165,33 @@ class Range:
         return self.bizdays
 
     @property
-    def bizdays(self):
-        "Generate business days."
-        day = self.since.clone()
-        while day <= self.until:
-            if day.open:
-                yield day
-            day = day + 1
-
-    @property
     def days(self):
         "Generate calendar days."
         day = self.since.clone()
-        while day <= self.until:
+        while True:
             yield day
+            if day == self.until:
+                return
             day = day + 1
+
+    @property
+    def bizdays(self):
+        "Generate business days."
+        for d in self.days:
+            if d.open:
+                yield d
 
     def __len__(self):
         "Count business days."
-        ans = 0
-        day = self.since.clone()
-        while day <= self.until:
-            ans += day.open
-            day = day + 1
-        return ans
+        return sum(1 for d in self.bizdays if d.open)
 
     @property
     def spec(self):
         "Range spec."
-
         if self.since.day == 1 and self.until.eom:
             if self.since.month == 1 and self.until.month == 12:
                 return range_join(str(self.since.year), str(self.until.year))
-            return range_join(
-                self.since.strftime('%Y%m'), self.until.strftime('%Y%m')
-            )
+            return range_join(self.since.strftime('%Y%m'), self.until.strftime('%Y%m'))
         return range_join(self.since.str, self.until.str)
 
 
