@@ -1,9 +1,10 @@
 # Bizcal – Pythonic Business (Trading) Calendar
 
-**Bizcal** is a simple business calendar package with three unique features:
+[**Bizcal**](https://github.com/sunyj/bizcal) is a powerful yet simple business
+calendar package with three unique features:
 
 - Compatibility: `bizcal.Date` is a drop-in replacement for `datetime.date`.
-- Pythonic: intuitive syntax.
+- Pythonic: intuitive syntax for calendar semantics.
 - Holiday-aware: not just *when* not trading, but also *why*.
 
 Bizcal is [listed on PyPI](https://pypi.org/project/bizcal/).
@@ -14,7 +15,8 @@ Bizcal abstracts dates with `Date` class, a direct subclass of the standard
 `datetime.date`, allowing it to seamlessly integrate into legacy codebases as
 a drop-in replacement for `datetime.date`.
 
-Additionally, `Date` includes several convenient methods and properties designed to simplify your code.
+Additionally, `Date` includes several convenient methods and properties designed
+to simplify your code.
 
 ## Pythonic
 
@@ -60,9 +62,11 @@ for day in period.days:
 ## Holiday-aware
 
 Certain exchanges, like [SHFE](https://www.shfe.com.cn/eng/) and
-[DCE](http://www.dce.com.cn/dceg/), adjust their trading hours based on holiday
-schedules. Bizcal not only identifies business (open) and non-business (closed)
-days but also specifies if a non-business day is a holiday.
+[DCE](http://www.dce.com.cn/dceg/),
+[adjust](https://www.shfe.com.cn/regulation/exchangerules/historicalversion/202305/t20230526_800245.html)
+their trading hours based on holiday schedules. Bizcal not only identifies business
+(open) and non-business (closed) days but also specifies if a non-business day is a
+holiday.
 
 ## API Reference
 
