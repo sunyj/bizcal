@@ -59,9 +59,10 @@ for day in period.days:
 
 ## Holiday-aware
 
-Certain exchanges, like [SHFE](https://tsite.shfe.com.cn/eng/) and [DCE](http://www.dce.com.cn/DCE/), adjust their trading hours based on holiday
-schedules. Bizcal not only identifies business (open) and non-business
-(closed) days but also specifies if a non-business day is a holiday.
+Certain exchanges, like [SHFE](https://www.shfe.com.cn/eng/) and
+[DCE](http://www.dce.com.cn/dceg/), adjust their trading hours based on holiday
+schedules. Bizcal not only identifies business (open) and non-business (closed)
+days but also specifies if a non-business day is a holiday.
 
 ## API Reference
 
