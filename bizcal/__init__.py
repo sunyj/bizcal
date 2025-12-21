@@ -59,6 +59,14 @@ class Calendar:
         beg, end = parse_range(spec)
         return (first_day(beg), last_day(end))
 
+    @property
+    def min(self):
+        return self(first_day(str(self.ymin)))
+
+    @property
+    def max(self):
+        return self(last_day(str(self.ymax)))
+
 
 class Date(pydt.date):
     def __new__(cls, y, m, d, cal, idx=None, holiday=None, biz=None, *, _internal=None):

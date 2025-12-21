@@ -24,7 +24,7 @@ Code snippets speak for themselves.  Check more in [unit tests](./test/basic.py)
 from bizcal import Calendar
 
 cne = Calendar([
-    '2023: 0101-2, 0121-29, 0405, 0429-0503, 0622-25, 0929-1008',
+    '2023: 0101-2, 0121-29, 0405, 0429-0503, 0622-5, 0929-1008',
     '2024: 0101, 0209-18, 0404-7, 0501-5, 0608-10, 0914-17, 1001-7',
 ])
 
@@ -74,6 +74,8 @@ cal = Calendar([
     '2023: 0101-2, 0121-29, 0405, 0429-0503, 0622-25, 0929-1008',
     '2024: 0101, 0209-18, 0404-7, 0501-5, 0608-10, 0914-17, 1001-7',
 ])
+cal.min # 2023-01-01
+cal.max # 2024-12-31
 ```
 
 The `Calendar(spec)` constructor accepts `spec` as either a string or a list
@@ -87,6 +89,7 @@ of strings.
 - The year line format is `YYYY: holidays, holidays, ...`, where `holidays`
   are specified as date ranges in the format `MMDD`, `MMDD-DD`, or
   `MMDD-MMDD`.
+- Properties `min` and `max` gives lower- and upper-bound of this calendar.
 
 ### Date creation
 

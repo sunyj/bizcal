@@ -89,6 +89,10 @@ class TestBasic(unittest.TestCase):
             ]
         )
 
+        self.assertEqual(cal.min.num, 20230101)
+        self.assertEqual(cal.min.holiday, True)
+        self.assertEqual(cal.max.str, '20241231')
+
         self.assertEqual(len(cal['202401']), 22)
         self.assertEqual(len(cal['202401-2']), 38)
 
