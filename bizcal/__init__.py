@@ -52,6 +52,14 @@ class Calendar:
             raise ValueError(f'illegal range spec {spec}')
         return Range(self(spec[0]), self(spec[1]), _internal=True)
 
+    def exclude(self, spec):
+        if isinstance(spec, list):
+            for s in spec:
+                self.exclude(s)
+        else:
+            day = self(spec)
+            self.table[day.year - self.ymin].add(day.month * 100 + day.day)
+
     @staticmethod
     def span(spec: str):
         if not isinstance(spec, str):

@@ -164,5 +164,22 @@ class TestBasic(unittest.TestCase):
             Calendar.span('20240101'), (pydt.date(2024, 1, 1), pydt.date(2024, 1, 1))
         )
 
+    def test_exclude(self):
+        cal = Calendar(['2024: 0101,0210-7,0404-6,0501-5,0610,0915-7,1001-7'])
+        self.assertTrue(cal(20240102).open)
+        self.assertFalse(cal(20240102).holiday)
+
+        cal.exclude(20240102)
+        day = cal(20240102)
+        self.assertFalse(day.open)
+        self.assertTrue(day.holiday)
+
+        cal.exclude([20240108, '20240109'])
+        self.assertFalse(cal(20240108).open)
+        self.assertFalse(cal(20240109).open)
+
+        with self.assertRaises(ValueError):
+            cal.exclude('20250103')
+
 
 ### test/basic.py ends here

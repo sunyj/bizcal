@@ -5,6 +5,8 @@ calendar package with three unique features:
 
 - Compatibility: `bizcal.Date` is a drop-in replacement for `datetime.date`.
 - Pythonic: intuitive syntax for calendar semantics.
+  - `yesterday = day - 1`
+  - `next_trading_day = day >> 1`
 - Holiday-aware: not just *when* not trading, but also *why*.
 
 Bizcal is [listed on PyPI](https://pypi.org/project/bizcal/).
@@ -95,6 +97,21 @@ of strings.
   are specified as date ranges in the format `MMDD`, `MMDD-DD`, or
   `MMDD-MMDD`.
 - Properties `min` and `max` gives lower- and upper-bound of this calendar.
+
+#### Exclude dates from business days
+
+```python
+from bizcal import Calendar
+cal = Calendar('2024: 0101, 0209-18, 0404-7, 0501-5, 0608-10, 0914-17, 1001-7')
+cal.exclude([20240102, '20240103'])
+
+cal(20240102).open    # False
+cal(20240102).holiday # True
+```
+
+- In some cases, ad-hoc exclusion of special days could be convenient.
+- Excluded dates are treated as holidays.
+- YYYYMMDD string, integer, or a list of them are accepted.
 
 ### Date creation
 
@@ -187,6 +204,7 @@ for day in cal['20240215-20'].days:
     flag = day and 'trading' or (day.holiday and 'holiday' or 'weekend')
     print(f'{day} is {flag}')
 ```
+
 ### Date span parsing
 
 Static method `Calendar.span(spec: str)` parses a string spec into
