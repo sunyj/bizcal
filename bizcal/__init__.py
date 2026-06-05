@@ -9,16 +9,25 @@ import datetime as pydt
 class Calendar:
     def __init__(self, spec):
         if isinstance(spec, str):
-            with open(spec) as f:
-                spec = [s.strip() for s in f if s.strip()]
+            # 2020-24
+            if re.match(r'\d{4}', spec):
+                beg, end = parse_range(spec)
+                spec = list(str(y) for y in range(int(beg), int(end) + 1))
+            else:
+                with open(spec) as f:
+                    spec = [s.strip() for s in f if s.strip()]
         cals = {}
         for line in spec:
-            year, cal_spec = line.split(':')
-            cals[int(year)] = set(
-                x
-                for holidays in cal_spec.split(',')
-                for x in dates_from_range(int(year), holidays)
-            )
+            seg = line.split(':')
+            if len(seg) == 2:
+                year, cal_spec = line.split(':')
+                cals[int(year)] = set(
+                    x
+                    for holidays in cal_spec.split(',')
+                    for x in dates_from_range(int(year), holidays)
+                )
+            else:
+                cals[int(line)] = set()
         if not cals:
             raise ValueError('invalid calendar spec')
         years = sorted(cals.keys())
@@ -26,6 +35,7 @@ class Calendar:
         self.ymax = years[-1]
         if self.ymax - self.ymin + 1 < len(years):
             raise ValueError('incomplete calendar spec')
+        # table holds holidays for each year
         self.table = [cals[y] for y in years]
         assert len(self.table) == self.ymax - self.ymin + 1
 

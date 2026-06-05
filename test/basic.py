@@ -59,6 +59,16 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal((2024, 1, 1)).holiday)
         self.assertTrue(cal(2024, 1, 1).holiday)
 
+    def test_crypto(self):
+        cal = Calendar('2020-4')
+        self.assertEqual(len(cal.table), 5)
+        self.assertTrue(cal(20240101).open)
+        self.assertTrue(cal(20200101).open)
+        self.assertFalse(cal(20200101).holiday)
+
+        span = cal['202402']
+        self.assertEqual(len(list(span.days)), 29)
+
     def test_helpers(self):
         from bizcal import first_day, last_day, range_join
 

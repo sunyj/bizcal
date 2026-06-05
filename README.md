@@ -5,8 +5,8 @@ calendar package with three unique features:
 
 - Compatibility: `bizcal.Date` is a drop-in replacement for `datetime.date`.
 - Pythonic: intuitive syntax for calendar semantics.
-  - `yesterday = day - 1`
-  - `next_trading_day = day >> 1`
+  - `yesterday = day - 1`, `tomorrow = day + 1`
+  - `prev_bizday = day << 1`, `next_bizday = day >> 1`
 - Holiday-aware: not just *when* not trading, but also *why*.
 
 Bizcal is [listed on PyPI](https://pypi.org/project/bizcal/).
@@ -70,6 +70,14 @@ their trading hours based on holiday schedules. Bizcal not only identifies busin
 (open) and non-business (closed) days but also specifies if a non-business day is a
 holiday.
 
+## Crypto
+
+Crypto markets operate continuously, so dedicated trading calendar utilities may appear
+unnecessary. However, when a system must support multiple assets, a single interface for
+managing trading calendars is still valuable, and often essential.
+
+Bizcal supports crypto markets by allowing the holiday set to be empty.
+
 ## API Reference
 
 ### Calendar definition
@@ -83,6 +91,9 @@ cal = Calendar([
 ])
 cal.min # 2023-01-01
 cal.max # 2024-12-31
+
+# define crypto trading calendar for 2020-2025
+cal2 = Calendar('2020-5')
 ```
 
 The `Calendar(spec)` constructor accepts `spec` as either a string or a list
@@ -91,6 +102,8 @@ of strings.
 - If `spec` is a string, it is treated as a path to a calendar definition
   file. Each line in the file defines the holidays (and potentially weekends)
   for a specific year.
+  - The only exception is: when it starts with foure digits, it is treated
+    as a range of years for crypto markets, where no holidays exist.
 - If `spec` is a list of strings, each string represents a line of calendar
   definitions for one year.
 - The year line format is `YYYY: holidays, holidays, ...`, where `holidays`
