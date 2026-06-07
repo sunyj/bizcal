@@ -65,9 +65,10 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(cal(20240101).open)
         self.assertTrue(cal(20200101).open)
         self.assertFalse(cal(20200101).holiday)
+        self.assertTrue(cal(20240601).open)
 
         span = cal['202402']
-        self.assertEqual(len(list(span.days)), 29)
+        self.assertEqual(len(list(span)), 29)
 
     def test_helpers(self):
         from bizcal import first_day, last_day, range_join

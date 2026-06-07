@@ -8,11 +8,13 @@ import datetime as pydt
 
 class Calendar:
     def __init__(self, spec):
+        self.crypto = False
         if isinstance(spec, str):
             # 2020-24
             if re.match(r'\d{4}', spec):
                 beg, end = parse_range(spec)
                 spec = list(str(y) for y in range(int(beg), int(end) + 1))
+                self.crypto = True
             else:
                 with open(spec) as f:
                     spec = [s.strip() for s in f if s.strip()]
@@ -98,11 +100,16 @@ class Date(pydt.date):
             day.idx = day.year - cal.ymin
         else:
             day.idx = idx
-        if holiday is None:
-            day.holiday = day.month * 100 + day.day in cal.table[day.idx]
+
+        if cal.crypto:
+            day.open = True
+            day.holiday = False
         else:
-            day.holiday = holiday
-        day.open = not day.holiday and day.weekday() < 5 if biz is None else biz
+            if holiday is None:
+                day.holiday = day.month * 100 + day.day in cal.table[day.idx]
+            else:
+                day.holiday = holiday
+            day.open = not day.holiday and day.weekday() < 5 if biz is None else biz
         return day
 
     def clone(self):

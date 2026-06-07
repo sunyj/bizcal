@@ -102,7 +102,7 @@ of strings.
 - If `spec` is a string, it is treated as a path to a calendar definition
   file. Each line in the file defines the holidays (and potentially weekends)
   for a specific year.
-  - The only exception is: when it starts with foure digits, it is treated
+  - The only exception is: when it starts with four digits, it is treated
     as a range of years for crypto markets, where no holidays exist.
 - If `spec` is a list of strings, each string represents a line of calendar
   definitions for one year.
